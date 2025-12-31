@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>С Новым Годом!</title>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* ✅ Главное: body НЕ должен быть overflow: hidden и должен растягиваться */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: linear-gradient(145deg, #2c0a0f, #3a0a10, #4a1015);
+      color: #fff;
+      font-family: 'Caveat', cursive;
+      /* ❌ УДАЛЕНО: min-height: 100vh, overflow: hidden */
+      position: relative;
+      padding-bottom: 120px; /* ✅ отступ снизу, чтобы текст не скрывался */
+    }
+
+    /* Затемнение — фиксированное, не мешает скроллу */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: radial-gradient(circle at center, transparent 35%, rgba(0,0,0,0.4) 100%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* ✅ Контейнер — обычный блок, без flex-центровки (она мешает прокрутке) */
+    .container {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      /* Убрали display: flex и min-height */
+    }
+
+    h1 {
+      font-size: 3.8rem;
+      margin-bottom: 1.5rem;
+      color: #e6c229;
+      text-shadow: 0 0 16px rgba(230, 194, 41, 0.6);
+      letter-spacing: 2px;
+    }
+
+    .message {
+      font-size: 1.8rem;
+      line-height: 1.6;
+      color: #ffd700;
+      text-shadow: 0 2px 5px rgba(0,0,0,0.35);
+      margin: 2rem 0;
+      /* ✅ Чтобы длинный текст не выходил за край */
+      white-space: pre-wrap;
+    }
+
+    .signature {
+      font-size: 1.6rem;
+      font-style: italic;
+      color: #d4b18a;
+      margin-top: 2rem;
+    }
+
+    /* ❗ Анимации — теперь в ОТДЕЛЬНОМ контейнере, который НЕ влияет на layout */
+    #animation-layer {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .snow, .tree, .sparkle {
+      position: absolute;
+      user-select: none;
+    }
+
+    .snow {
+      font-size: 1.3rem;
+      opacity: 0.92;
+      animation: fall linear forwards;
+    }
+
+    .tree {
+      font-size: 1.15rem;
+      color: #4a7c59;
+      opacity: 0.87;
+      animation: drift linear forwards;
+    }
+
+    .sparkle {
+      font-size: 14px;
+      color: #e6c229;
+      text-shadow: 0 0 6px #ffd700;
+      opacity: 0;
+    }
+
+    @keyframes fall {
+      to { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+    }
+
+    @keyframes drift {
+      to { transform: translate(calc(100vw * var(--dx)), 110vh) rotate(720deg); opacity: 0.2; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ✅ Основной контент — обычный, прокручиваемый -->
+  <div class="container">
+    <h1>✨ С Новым 2026 Годом! ✨</h1>
+    <div class="message">
+Семья, поздравляю Вас с новым 2026 годом!
+
+Я выражаю свою благодарность и искренность слез за нашу дружную команду!
+Спасибо Вам, что мы встретились в 2025 году и подарили мне
+тепло,
+уют и
+доброту, которая веет детством.
+
+Спасибо за Ваши улыбки, счастливые голоса,
+за сияющие глаза, мужество и спокойствие,
+за то, что Вы — творцы, которых так сложно найти!
+За то, что исполнили мою мечту о группе.
+За то, что Вы просто есть.
+
+Встретить Вас — это выиграть лотерею ЖИЗНИ.
+Вы — то самое сокровище.
+Спасибо за принятие, решительность и мудрые слова.
+
+Пусть 2025 заберёт печали,
+а 2026 подарит силы, радость и уверенность:
+как бы ни было —
+МЫ есть друг у друга.
+
+Пусть Ваши улыбки станут маяками.
+Мы уже сияем — просто это поле невидимое,
+ведь главное — не вид, а звук.
+Не как мы выглядим,
+а как мы звучим.
+
+И пока у всех — звон бокалов,
+у нас — звон сердец.
+    </div>
+    <div class="signature">Рыжая тильняшка</div>
+  </div>
+
+  <!-- ✅ Слой анимаций — поверх всего, но не влияет на прокрутку -->
+  <div id="animation-layer"></div>
+
+  <audio id="bgm" preload="auto">
+    <source src="music.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    const animLayer = document.getElementById('animation-layer');
+    let musicStarted = false;
+    const audio = document.getElementById('bgm');
+
+    function startMusic() {
+      if (!musicStarted) {
+        audio.volume = 0.6;
+        audio.play().catch(e => console.log("Музыка не запустилась:", e));
+        musicStarted = true;
+      }
+    }
+
+    // Запуск музыки при любом взаимодействии
+    document.addEventListener('click', startMusic, { once: true });
+    document.addEventListener('touchstart', startMusic, { once: true });
+    document.addEventListener('mousemove', startMusic, { once: true });
+
+    // Анимации — в отдельном слое
+    setInterval(() => {
+      const snow = document.createElement('div');
+      snow.className = 'snow';
+      snow.textContent = ['❅','❆','❄'][Math.floor(Math.random()*3)];
+      snow.style.left = Math.random() * 100 + 'vw';
+      snow.style.top = '-10px';
+      snow.style.animationDuration = (5 + Math.random() * 6) + 's';
+      animLayer.appendChild(snow);
+      setTimeout(() => snow.remove(), 12000);
+    }, 300);
+
+    setInterval(() => {
+      const tree = document.createElement('div');
+      tree.className = 'tree';
+      tree.textContent = '🌲';
+      tree.style.left = Math.random() * 100 + 'vw';
+      tree.style.top = '-20px';
+      tree.style.setProperty('--dx', (Math.random() > 0.5 ? 1 : -1) * (0.2 + Math.random() * 0.6));
+      tree.style.animationDuration = (10 + Math.random() * 7) + 's';
+      animLayer.appendChild(tree);
+      setTimeout(() => tree.remove(), 18000);
+    }, 1100);
+
+    setInterval(() => {
+      const s = document.createElement('div');
+      s.className = 'sparkle';
+      s.textContent = '✧';
+      s.style.left = '50%';
+      s.style.top = '50%';
+      s.style.transform = 'translate(-50%, -50%)';
+      animLayer.appendChild(s);
+
+      const angle = (Math.random() - 0.5) * 3;
+      const dur = 0.8 + Math.random() * 0.5;
+
+      s.animate([
+        { opacity: 1, transform: 'translate(-50%, -50%) scale(1)' },
+        { 
+          opacity: 0, 
+          transform: `translate(calc(-50% + ${angle*80}px), calc(-50% - 120px)) scale(0.4) rotate(${Math.random()*720}deg)`
+        }
+      ], {
+        duration: dur * 1000,
+        easing: 'cubic-bezier(0.2, 0.8, 0.4, 1)'
+      });
+
+      setTimeout(() => s.remove(), dur * 1000 + 100);
+    }, 600);
+  </script>
+<script>
+  // 1. Создаём «тихий триггер» — короткий звук, чтобы разблокировать автоплей
+  function unlockAudio() {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = ctx.createOscillator();
+    const gain = ctx.createGain();
+    oscillator.connect(gain);
+    gain.connect(ctx.destination);
+    gain.gain.value = 0; // 🔇 полностью тихо
+    oscillator.start();
+    oscillator.stop(ctx.currentTime + 0.001); // 1 мс — достаточно
+    ctx.close();
+
+    // 2. Теперь запускаем ВАШУ музыку
+    const audio = new Audio('music.mp3');
+    audio.loop = true;
+    audio.volume = 0.6; // комфортная громкость
+    audio.play().catch(e => {
+      console.warn("Музыка не проигралась автоматически. Попробуйте кликнуть на страницу.");
+      // На случай, если браузер всё равно заблокировал — запустим по клику
+      document.body.addEventListener('click', () => audio.play().catch(() => {}), { once: true });
+    });
+
+    // Убираем прослушку, чтобы не дублировать
+    document.removeEventListener('DOMContentLoaded', unlockAudio);
+    document.removeEventListener('touchstart', unlockAudio);
+    document.removeEventListener('mousedown', unlockAudio);
+  }
+
+  // Запускаем при первой возможности
+  document.addEventListener('DOMContentLoaded', unlockAudio);
+  document.addEventListener('touchstart', unlockAudio, { once: true });
+  document.addEventListener('mousedown', unlockAudio, { once: true });
+</script>
+</body>
+</html>
